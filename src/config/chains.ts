@@ -116,6 +116,29 @@ export const mapo = defineChain({
   },
 });
 
+export const Combo = defineChain({
+  id: 9980,
+  name: "Combo Mainnet",
+  network: "Combo Mainnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "BNB",
+    symbol: "BNB",
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://rpc.combonetwork.io"],
+    },
+    public: {
+      http: ["https://rpc.combonetwork.io"],
+    },
+  },
+  blockExplorers: {
+    default: { name: "Explorer", url: "https://combonetwork.io/" },
+  },
+});
+
+
 export const inscriptionChains = {
   eth: mainnet,
   bsc,
@@ -147,6 +170,7 @@ export const inscriptionChains = {
   filecoin,
   shibarium,
   sepolia,
+  Combo
 };
 
 export type ChainKey = keyof typeof inscriptionChains;
