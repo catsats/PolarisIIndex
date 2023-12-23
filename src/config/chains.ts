@@ -138,6 +138,28 @@ export const Combo = defineChain({
   },
 });
 
+export const BEVM = defineChain({
+  id: 1501,
+  name: "BEVM",
+  network: "BEVM",
+  nativeCurrency: {
+    decimals: 18,
+    name: "BTC",
+    symbol: "BTC",
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://rpc-1.bevm.io"],
+    },
+    public: {
+      http: ["https://rpc-1.bevm.io"],
+    },
+  },
+  blockExplorers: {
+    default: { name: "Explorer", url: "https://scan.bevm.io" },
+  },
+});
+
 
 export const inscriptionChains = {
   eth: mainnet,
@@ -170,7 +192,8 @@ export const inscriptionChains = {
   filecoin,
   shibarium,
   sepolia,
-  Combo
+  Combo,
+  BEVM
 };
 
 export type ChainKey = keyof typeof inscriptionChains;
