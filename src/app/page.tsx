@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   Button,
@@ -8,7 +8,7 @@ import {
   RadioGroup,
   TextField,
 } from "@mui/material";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState,useEffect } from "react";
 import {
   Chain,
   createWalletClient,
@@ -58,11 +58,12 @@ export default function Home() {
   
   const [minid, setMinid] = useState<number>(1);
   const [maxid, setMaxid] = useState<number>(1000000);
-
   const [idlist, setIdlist] = useState<Array<number>>([]); //id列表
-
+  
   const listidRef = useRef<Array<number>>([]);
   const listIndexRef = useRef<number>(0);
+
+  const inscriptionRef = useRef<string>('');
 
   const pushLog = useCallback((log: string, state?: string) => {
     setLogs((logs) => [
@@ -78,7 +79,7 @@ export default function Home() {
   const accounts = privateKeys.map((key) => privateKeyToAccount(key));
 
   //生成id值1-1000000
-  const randomidnum = (min: number, max: number) => {
+  const randomidnum:any = (min: number, max: number) => {
     const randomInteger:number = Math.floor(Math.random() * (max - min + 1)) + min;
     if(!listidRef.current.includes(randomInteger)){
       listidRef.current.push(randomInteger);
@@ -101,17 +102,22 @@ export default function Home() {
     return idnum;
   }
 
-  
+  useEffect(()=>{
+    if(running == false) {
+      listidRef.current = [];
+      listIndexRef.current = 0;
+    }
+  },[running,randomid])
 
   useInterval(
     async () => {
       const results = await Promise.allSettled(
         accounts.map((account) => {
+          let uuid = null;
           if(radioid == "haveid") { //id模式
-            let uuid = null;
             if(randomid == "rangeid") { //指定范围id模式
-              let idnum = maxid-minid+1; //可以打的id数量
-              let alreaid = listidRef.current.length; //已经打的id数量
+              let idnum = maxid-minid+1; 
+              let alreaid = listidRef.current.length; 
               if(alreaid >= idnum){
                 setRunning(false);
                 pushLog(`选定的id已打完`, "success");
@@ -128,19 +134,19 @@ export default function Home() {
               uuid = specifyidnum();
             }
 
-            let template = Handlebars.compile(inscription.trim());
+            let template = Handlebars.compile(inscription);
             let templateData = { "uuid": `${uuid}` };
             let tokenJson = template(templateData);
-            setInscription(tokenJson)
-            console.log("当前id",uuid);
+            inscriptionRef.current = tokenJson;
+            console.log("当前id",uuid,tokenJson);
           }
           return client.sendTransaction({
             account,
             to: radio === "meToMe" ? account.address : toAddress,
             value: parseEther(sendValue),
-            ...(inscription
+            ...(inscriptionRef.current
               ? {
-                  data: stringToHex(inscription),
+                  data: stringToHex(inscriptionRef.current),
                 }
               : {}),
             ...(gas > 0
@@ -319,6 +325,7 @@ export default function Home() {
           onChange={(e) => {
             const text = e.target.value;
             setInscription(text.trim());
+            inscriptionRef.current = text.trim();
           }}
         />
       </div>
