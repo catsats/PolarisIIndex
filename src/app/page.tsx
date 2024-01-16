@@ -8,7 +8,7 @@ import {
   RadioGroup,
   TextField,
 } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   Chain,
   createWalletClient,
@@ -27,18 +27,23 @@ import Log from "@/components/Log";
 import { ChainKey, inscriptionChains } from "@/config/chains";
 import useInterval from "@/hooks/useInterval";
 import { handleAddress, handleLog } from "@/utils/helper";
+import Handlebars from 'handlebars';
+import { v4 as uuidv4 } from 'uuid';
 
 const example =
   'data:,{"p":"asc-20","op":"mint","tick":"aval","amt":"100000000"}';
-
+const exampleid =
+  'data:,{"p":"asc-20","op":"mint","tick":"aval","id":"{{uuid}}","amt":"100000000"}';
 type RadioType = "meToMe" | "manyToOne";
-
+type RadioidType = "noid" | "haveid";
 type GasRadio = "all" | "tip";
+type randomIDType = "rangeid" | "specifyid";
 
 export default function Home() {
   const [chain, setChain] = useState<Chain>(mainnet);
   const [privateKeys, setPrivateKeys] = useState<Hex[]>([]);
   const [radio, setRadio] = useState<RadioType>("meToMe");
+  const [radioid, setRadioid] = useState<RadioidType>("noid");
   const [toAddress, setToAddress] = useState<Hex>();
   const [rpc, setRpc] = useState<string>();
   const [inscription, setInscription] = useState<string>("");
@@ -49,6 +54,15 @@ export default function Home() {
   const [successCount, setSuccessCount] = useState<number>(0);
   const [gasRadio, setGasRadio] = useState<GasRadio>("tip");
   const [sendValue, setSendValue] = useState<string>("0");
+  const [randomid, setRandomid] = useState<randomIDType>("rangeid");
+  
+  const [minid, setMinid] = useState<number>(1);
+  const [maxid, setMaxid] = useState<number>(1000000);
+
+  const [idlist, setIdlist] = useState<Array<number>>([]); //id列表
+
+  const listidRef = useRef<Array<number>>([]);
+  const listIndexRef = useRef<number>(0);
 
   const pushLog = useCallback((log: string, state?: string) => {
     setLogs((logs) => [
@@ -63,10 +77,63 @@ export default function Home() {
   });
   const accounts = privateKeys.map((key) => privateKeyToAccount(key));
 
+  //生成id值1-1000000
+  const randomidnum = (min: number, max: number) => {
+    const randomInteger:number = Math.floor(Math.random() * (max - min + 1)) + min;
+    if(!listidRef.current.includes(randomInteger)){
+      listidRef.current.push(randomInteger);
+      return randomInteger;
+    }else {
+      let idnum = maxid-minid+1; //可以打的id数量
+      let alreaid = listidRef.current.length; //已经打的id数量
+      if(alreaid >= idnum){
+        return;
+      }else {
+        return randomidnum(min,max);
+      }
+    }
+  }
+
+  //返回指定值
+  const specifyidnum = () => {
+    let idnum = idlist[listIndexRef.current]; //可以打的id数量
+    listIndexRef.current += 1;
+    return idnum;
+  }
+
+  
+
   useInterval(
     async () => {
       const results = await Promise.allSettled(
         accounts.map((account) => {
+          if(radioid == "haveid") { //id模式
+            let uuid = null;
+            if(randomid == "rangeid") { //指定范围id模式
+              let idnum = maxid-minid+1; //可以打的id数量
+              let alreaid = listidRef.current.length; //已经打的id数量
+              if(alreaid >= idnum){
+                setRunning(false);
+                pushLog(`选定的id已打完`, "success");
+                return;
+              }
+              uuid = randomidnum(minid,maxid);
+            }
+            if(randomid == "specifyid"){ //指定id模式
+              if(listIndexRef.current >= idlist.length){
+                setRunning(false);
+                pushLog(`指定的id已打完`, "success");
+                return;
+              }
+              uuid = specifyidnum();
+            }
+
+            let template = Handlebars.compile(inscription.trim());
+            let templateData = { "uuid": `${uuid}` };
+            let tokenJson = template(templateData);
+            setInscription(tokenJson)
+            console.log("当前id",uuid);
+          }
           return client.sendTransaction({
             account,
             to: radio === "meToMe" ? account.address : toAddress,
@@ -221,7 +288,29 @@ export default function Home() {
         </div>
       )}
 
-      <div className=" flex flex-col gap-2">
+      <RadioGroup
+        row
+        defaultValue="noid"
+        onChange={(e) => {
+          const value = e.target.value as RadioidType;
+          setRadioid(value);
+        }}
+      >
+        <FormControlLabel
+          value="noid"
+          control={<Radio />}
+          label="默认铭文"
+          disabled={running}
+        />
+        <FormControlLabel
+          value="haveid"
+          control={<Radio />}
+          label="铭文动态id模式"
+          disabled={running}
+        />
+      </RadioGroup>
+
+      {radioid == "noid" && <div className=" flex flex-col gap-2">
         <span>铭文（选填，原始铭文，不是转码后的十六进制）:</span>
         <TextField
           size="small"
@@ -233,6 +322,95 @@ export default function Home() {
           }}
         />
       </div>
+    }
+
+    {radioid == "haveid" && <>
+    <div className=" flex flex-col gap-2">
+        <span>铭文+id（选填，原始铭文，不是转码后的十六进制）:</span>
+        <TextField
+          size="small"
+          placeholder={`铭文，不要输入错了，多检查下，例子：\n${exampleid}`}
+          disabled={running}
+          onChange={(e) => {
+            const text = e.target.value;
+            setInscription(text.trim());
+          }}
+        />
+      </div>
+      <RadioGroup
+        row
+        defaultValue="rangeid"
+        onChange={(e) => {
+          const value = e.target.value as randomIDType;
+          setRandomid(value);
+        }}
+      >
+        <FormControlLabel
+          value="rangeid"
+          control={<Radio />}
+          label="指定范围id"
+          disabled={running}
+        />
+        <FormControlLabel
+          value="specifyid"
+          control={<Radio />}
+          label="指定id"
+          disabled={running}
+        />
+      </RadioGroup>
+      <a href="https://twitter.com/zisan_xyz/status/1747252537840095430" style={{color: "#90caf9"}}>id查重教程 - 道士钟发白</a>
+      {
+        randomid == "rangeid" && <>
+          <div className="flex flex-col gap-2">
+            <span>id范围是1-1000000中的随机id（默认范围有打重的风险，建议指定id范围避免打重复）</span>
+            <TextField
+              size="small"
+              placeholder="选填：1"
+              disabled={running}
+              onChange={(e) => {
+                const id = Number(e.target.value);
+                setMinid(id);
+              }}
+            />
+            <TextField
+              size="small"
+              placeholder="选填：1000000 （填入的是铭文的最大张数）"
+              disabled={running}
+              onChange={(e) => {
+                const id = Number(e.target.value);
+                setMaxid(id);
+              }}
+            />
+        </div>
+        </>
+      }
+
+      {
+        randomid == "specifyid" && <>
+          <div className="flex flex-col gap-2">
+            <span>打指定id 用英文,逗号分隔开来</span>
+            <TextField
+              multiline
+              minRows={2}
+              size="small"
+              placeholder="例子：324,123,453,2655433,2355"
+              disabled={running}
+              onChange={(e) => {
+                const text = e.target.value;
+                const lines = text.split(",");
+                const lists = lines.map((items) => {
+                  return Number(items);
+                })
+                setIdlist(lists);
+              }}
+            />
+        </div>
+        </>
+      }
+    </>
+
+      
+    }
 
       <div className=" flex flex-col gap-2">
         <span>
@@ -241,7 +419,7 @@ export default function Home() {
         <a target="_blank" href="https://twitter.com/zisan_xyz/status/1736586479013634511" style={{color: "#90caf9"}}>《RPC链接寻找教程》 ps:请关注开发者发出更多开源脚本 - 道士钟发白</a>
         <TextField
           size="small"
-          placeholder="RPC"
+          placeholder="RPC 默认能不填，有自己的PRC节点可以填进去"
           disabled={running}
           onChange={(e) => {
             const text = e.target.value;
@@ -250,9 +428,9 @@ export default function Home() {
         />
       </div>
 
-      <div className=" flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         <span>
-          发送数量:
+          发送代币数量:
         </span>
         <TextField
           size="small"
@@ -305,7 +483,7 @@ export default function Home() {
       </div>
 
       <div className=" flex flex-col gap-2">
-        <span>每笔交易间隔时间 (选填, 最低 0 ms):</span>
+        <span>每笔交易间隔时间 1秒=1000ms (选填, 最低 0 ms):</span>
         <TextField
           type="number"
           size="small"

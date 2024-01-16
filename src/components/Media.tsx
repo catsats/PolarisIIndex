@@ -43,6 +43,29 @@ export default function Media() {
       <div className=" text-center">
         打赏地址☕️: 0x3d9d43182843e9cc66b18482cb99b8d2f8258900
       </div>
+      <div style={{"color": "gold"}} className="text-center">
+        不知道脚本怎么配置,关注右边推特和TG群每次打之前都会发配置截图：
+        <Box
+                component={Link}
+                href={"https://twitter.com/zisan_xyz"}
+                className=" hover:underline"
+                sx={{
+                  color: "primary.main",
+                }}
+              >
+                {"@zisan_xyz"}
+        </Box>，
+        <Box
+                component={Link}
+                href={"https://t.me/daoshi8080"}
+                className=" hover:underline"
+                sx={{
+                  color: "primary.main",
+                }}
+              >
+                {"https://t.me/daoshi8080"}
+        </Box>
+      </div>
     </div>
   );
 }

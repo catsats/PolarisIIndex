@@ -26,6 +26,7 @@ import {
   polygon,
   sepolia,
   zkSync,
+  bscTestnet
 } from "viem/chains";
 
 export const shibarium = defineChain({
@@ -193,7 +194,8 @@ export const inscriptionChains = {
   shibarium,
   sepolia,
   Combo,
-  BEVM
+  BEVM,
+  bscTestnet
 };
 
 export type ChainKey = keyof typeof inscriptionChains;
