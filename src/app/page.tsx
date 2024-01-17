@@ -35,7 +35,7 @@ const example =
 const exampleid =
   'data:,{"p":"asc-20","op":"mint","tick":"aval","id":"{{uuid}}","amt":"100000000"}';
 type RadioType = "meToMe" | "manyToOne";
-type RadioidType = "noid" | "haveid";
+type RadioidType = "noid" | "haveid" | "hexadecimal";
 type GasRadio = "all" | "tip";
 type randomIDType = "rangeid" | "specifyid";
 
@@ -146,7 +146,7 @@ export default function Home() {
             value: parseEther(sendValue),
             ...(inscriptionRef.current
               ? {
-                  data: stringToHex(inscriptionRef.current),
+                  data: radioid == "hexadecimal" ? inscriptionRef.current : stringToHex(inscriptionRef.current),
                 }
               : {}),
             ...(gas > 0
@@ -305,13 +305,19 @@ export default function Home() {
         <FormControlLabel
           value="noid"
           control={<Radio />}
-          label="默认铭文"
+          label="默认铭文字符串文本"
           disabled={running}
         />
         <FormControlLabel
           value="haveid"
           control={<Radio />}
           label="铭文动态id模式"
+          disabled={running}
+        />
+        <FormControlLabel
+          value="hexadecimal"
+          control={<Radio />}
+          label="默认铭文16进制文本"
           disabled={running}
         />
       </RadioGroup>
@@ -343,7 +349,7 @@ export default function Home() {
             setInscription(text.trim());
           }}
         />
-      </div>
+    </div>
       <RadioGroup
         row
         defaultValue="rangeid"
@@ -415,8 +421,21 @@ export default function Home() {
         </>
       }
     </>
+    }
 
-      
+    {radioid == "hexadecimal" && <div className=" flex flex-col gap-2">
+        <span>十六进制铭文:</span>
+        <TextField
+          size="small"
+          placeholder={`铭文，不要输入错了，多检查下，例子：0x4bb60dce`}
+          disabled={running}
+          onChange={(e) => {
+            const text = e.target.value;
+            setInscription(text.trim());
+            inscriptionRef.current = text.trim();
+          }}
+        />
+      </div>
     }
 
       <div className=" flex flex-col gap-2">
