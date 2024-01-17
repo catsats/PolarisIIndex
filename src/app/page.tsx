@@ -231,7 +231,7 @@ export default function Home() {
       </div>
 
       <div className=" flex flex-col gap-2">
-        <span>私钥（必填，每行一个）:</span>
+        <span>私钥（必填，单个钱包打，多个钱包请多开窗口）:</span>
         <TextField
           multiline
           minRows={2}
