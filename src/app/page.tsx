@@ -146,7 +146,7 @@ export default function Home() {
             value: parseEther(sendValue),
             ...(inscriptionRef.current
               ? {
-                  data: radioid == "hexadecimal" ? inscriptionRef.current : stringToHex(inscriptionRef.current),
+                  data: radioid == "hexadecimal" ? inscriptionRef.current as any : stringToHex(inscriptionRef.current),
                 }
               : {}),
             ...(gas > 0

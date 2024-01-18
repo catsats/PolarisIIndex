@@ -161,6 +161,28 @@ export const BEVM = defineChain({
   },
 });
 
+export const Metis = defineChain({
+  id: 1088,
+  name: "Metis Andromeda Mainnet",
+  network: "Metis Andromeda Mainnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "METIS",
+    symbol: "METIS",
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://metis-pokt.nodies.app"],
+    },
+    public: {
+      http: ["https://metis-pokt.nodies.app"],
+    },
+  },
+  blockExplorers: {
+    default: { name: "Explorer", url: "https://explorer.metis.io" },
+  },
+});
+
 
 export const inscriptionChains = {
   eth: mainnet,
@@ -195,7 +217,8 @@ export const inscriptionChains = {
   sepolia,
   Combo,
   BEVM,
-  bscTestnet
+  bscTestnet,
+  Metis
 };
 
 export type ChainKey = keyof typeof inscriptionChains;
