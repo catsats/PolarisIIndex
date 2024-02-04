@@ -183,12 +183,33 @@ export const Metis = defineChain({
   },
 });
 
+export const Zeta = defineChain({
+  id: 7000,
+  name: "ZetaChain Mainnet",
+  network: "ZetaChain Mainnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "ZETA",
+    symbol: "ZETA",
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://zetachain-mainnet-archive.allthatnode.com:8545"],
+    },
+    public: {
+      http: ["https://zetachain-mainnet-archive.allthatnode.com:8545"],
+    },
+  },
+  blockExplorers: {
+    default: { name: "Explorer", url: "https://zetachain.blockscout.com" },
+  },
+});
 
 export const inscriptionChains = {
   eth: mainnet,
   bsc,
   opBNB,
-  // okc,
+  Zeta,
   polygon,
   fantom,
   avalanche,

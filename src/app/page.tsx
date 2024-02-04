@@ -22,7 +22,6 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { mainnet } from "viem/chains";
-
 import Log from "@/components/Log";
 import { ChainKey, inscriptionChains } from "@/config/chains";
 import useInterval from "@/hooks/useInterval";
@@ -59,7 +58,7 @@ export default function Home() {
   const [minid, setMinid] = useState<number>(1);
   const [maxid, setMaxid] = useState<number>(1000000);
   const [idlist, setIdlist] = useState<Array<number>>([]); //id列表
-  
+
   const listidRef = useRef<Array<number>>([]);
   const listIndexRef = useRef<number>(0);
 
@@ -205,6 +204,7 @@ export default function Home() {
     setRunning(true);
   }, [privateKeys.length, pushLog, radio, toAddress]);
 
+
   return (
     <div className=" flex flex-col gap-4">
       <div className=" flex flex-col gap-2">
@@ -236,7 +236,7 @@ export default function Home() {
           multiline
           minRows={2}
           size="small"
-          placeholder="私钥，带不带 0x 都行，程序会自动处理"
+          placeholder="私钥，带不带 0x 都行，程序会自动处理，网站不记录数据每次进入请重新输入私钥"
           disabled={running}
           onChange={(e) => {
             const text = e.target.value;
