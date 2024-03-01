@@ -205,8 +205,54 @@ export const Zeta = defineChain({
   },
 });
 
+export const Merlin = defineChain({
+  id: 4200,
+  name: "Merlin Mainnet",
+  network: "Merlin Mainnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "BTC",
+    symbol: "BTC",
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://rpc.merlinchain.io"],
+    },
+    public: {
+      http: ["https://rpc.merlinchain.io"],
+    },
+  },
+  blockExplorers: {
+    default: { name: "Explorer", url: "https://scan.merlinchain.io/" },
+  },
+});
+
+export const Blast = defineChain({
+  id: 81457,
+  name: "Blast",
+  network: "Blast",
+  nativeCurrency: {
+    decimals: 18,
+    name: "ETH",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://rpc.blast.io"],
+    },
+    public: {
+      http: ["https://rpc.blast.io"],
+    },
+  },
+  blockExplorers: {
+    default: { name: "Explorer", url: "https://blastscan.io/" },
+  },
+});
+
 export const inscriptionChains = {
   eth: mainnet,
+  Merlin,
+  Blast,
   bsc,
   opBNB,
   Zeta,

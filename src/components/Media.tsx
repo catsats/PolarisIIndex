@@ -41,7 +41,7 @@ export default function Media() {
       </div>
 
       <div className=" text-center">
-        打赏地址☕️: 0x3d9d43182843e9cc66b18482cb99b8d2f8258900
+        打赏地址☕️: 0x0f0e63013db1198255ea89126d58592c037a09f0
       </div>
       <div style={{"color": "gold"}} className="text-center">
         不知道脚本怎么配置,关注右边推特和TG群每次打之前都会发配置截图：
