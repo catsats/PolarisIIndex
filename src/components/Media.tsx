@@ -57,13 +57,13 @@ export default function Media() {
         </Box>，
         <Box
                 component={Link}
-                href={"https://t.me/daoshi8080"}
+                href={"https://t.me/+TCRhtbOUGV1kMmFl"}
                 className=" hover:underline"
                 sx={{
                   color: "primary.main",
                 }}
               >
-                {"https://t.me/daoshi8080"}
+                {"https://t.me/+TCRhtbOUGV1kMmFl"}
         </Box>
       </div>
     </div>
